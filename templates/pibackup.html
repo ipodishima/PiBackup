@@ -78,9 +78,11 @@
         }
         function startBackup() {
             let backupType = document.querySelector('input[name="backup_type"]:checked').value;
-            fetch(`/start_backup/${backupType}`).then(function(response) {
+            fetch(`/start_backup/${backupType}`)
+            .then(function(response) {
                 return response.text();
-            }).then(function(text) {
+            })
+            .then(function(text) {
                 document.getElementById('backup-output').textContent = text;
             });
         }

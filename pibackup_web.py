@@ -28,6 +28,7 @@ import exiftool, os, shutil, subprocess, sys, time, glob
 from pibackup import check_connected_disks
 from pibackup import list_files_to_copy
 from pibackup import eject_disks
+from pibackup import start_pibackup
 
 led_pin = 16               # 3mm Red LED in series with 2k2 resistor connected to pin 16
 GPIO.setmode(GPIO.BOARD)
@@ -80,28 +81,21 @@ def list_files_to_copy_route(file_type):
     files_to_copy_str += "</table>"
     return files_to_copy_str
 
-@app.route("/pibackup/", methods=['GET', 'POST'])
+@app.route("/pibackup/")
 def pi_backup():
-    templateData = {'title': 'Richon -'}
-    if request.method == 'POST':
-        # Determine the backup type based on the user's selection
-        backup_type = None
-        if request.form.get('PBK_J') == 'JPG':
-            backup_type = 'j'
-        elif request.form.get('PBK_R') == 'RAW':
-            backup_type = 'r'
-        elif request.form.get('PBK_JR') == 'JPG+RAW':
-            backup_type = 'jr'
-        elif request.form.get('PBK_V') == 'Video':
-            backup_type = 'v'
-        elif request.form.get('PBK_JRV') == 'JPG+RAW+Video':
-            backup_type = 'jrv'
-
-        if backup_type:
-            # Redirect to the streaming endpoint with the backup type as a parameter
-            return redirect(url_for('pibackup_stream', backup_type=backup_type))
-    
+    templateData = {      'title' : 'Richon -',      }
     return render_template('pibackup.html', **templateData)
+
+@app.route("/start_backup/<backup_type>")
+def start_backup(backup_type):    
+    # Validate the backup_type to prevent any unexpected value
+    if backup_type not in ['j', 'r', 'jr', 'v', 'jrv']:
+        return "Invalid backup type", 400
+
+    start_pibackup(backup_type)
+
+    # Redirect to the streaming endpoint with the backup type as a parameter
+    return redirect('/pibackup_report/')
 
 @app.route("/piclone/", methods=['GET', 'POST'])
 def pi_clone():

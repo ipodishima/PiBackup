@@ -312,10 +312,10 @@ def eject_disks():
     source, destination = check_connected_disks()
     finalize(source, destination)
 
-def start_pibackup():
+def start_pibackup(file_type):
     print("***** PiBackup *****" + '\n')
     path_source_disk, path_destination_disk = check_connected_disks()    
-    s_files, path_s_files, d_files, path_d_files = creating_file_list(path_source_disk, path_destination_disk, sys.argv[1])
+    s_files, path_s_files, d_files, path_d_files = creating_file_list(path_source_disk, path_destination_disk, file_type)
     files_to_copy, path_files_to_copy, total_files_to_copy = list_analysis(s_files, path_s_files, d_files, path_d_files, path_destination_disk)
     if len(files_to_copy) == 0:
         print("\nNo new files to backup")
